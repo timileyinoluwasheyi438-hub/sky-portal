@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="fw-bold mb-4">Search</h3>
+<form method="get" class="mb-4">
+    <div class="input-group input-group-lg">
+        <input type="text" name="q" class="form-control" placeholder="Search teams, departments, managers..." value="{{ query }}">
+        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+    </div>
+</form>
+
+{% if query %}
+<h5 class="mb-3">Results for "{{ query }}"</h5>
+
+{% if teams %}
+<h6 class="text-muted mb-2">Teams</h6>
+<div class="row g-2 mb-4">
+    {% for team in teams %}
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h6 class="fw-bold">{{ team.name }}</h6>
+            <p class="small text-muted mb-2">{{ team.department.name }}</p>
+            <a href="{% url 'team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if departments %}
+<h6 class="text-muted mb-2">Departments</h6>
+{% for dept in departments %}
+<div class="card p-3 mb-2">
+    <strong>{{ dept.name }}</strong>
+    <p class="small text-muted mb-0">{{ dept.description }}</p>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not teams and not departments %}
+<div class="alert alert-info">No results found for "{{ query }}"</div>
+{% endif %}
+{% endif %}
+{% endblock %}

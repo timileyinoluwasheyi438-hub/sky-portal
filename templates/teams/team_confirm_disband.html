@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card p-4 text-center">
+            <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+            <h4>Disband "{{ team.name }}"?</h4>
+            <p class="text-muted">The team will be marked as disbanded. You can undo this by editing the team.</p>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger me-2">Yes, Disband</button>
+                <a href="{% url 'team_detail' team.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

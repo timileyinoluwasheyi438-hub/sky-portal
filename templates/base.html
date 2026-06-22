@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKY Engineering Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f0f4f8; }
+        .navbar { background: #003087 !important; }
+        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 10px; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark navbar-expand-lg px-4">
+    <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+        <i class="fas fa-satellite-dish me-2"></i>SKY Engineering Portal
+    </a>
+    {% if user.is_authenticated %}
+    <div class="ms-auto d-flex gap-3 align-items-center">
+        <a class="nav-link text-white" href="{% url 'search' %}"><i class="fas fa-search me-1"></i>Search</a>
+        <a class="nav-link text-white" href="{% url 'team_list' %}"><i class="fas fa-users me-1"></i>Teams</a>
+        <a class="nav-link text-white" href="{% url 'team_create' %}"><i class="fas fa-plus me-1"></i>New Team</a>
+        <a class="nav-link text-white" href="{% url 'audit_log' %}"><i class="fas fa-history me-1"></i>Audit</a>
+        <a class="nav-link text-white" href="{% url 'profile' %}"><i class="fas fa-user me-1"></i>{{ user.username }}</a>
+        <a class="nav-link text-white" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+    {% endif %}
+</nav>
+
+<div class="container-fluid py-4 px-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">All Teams</h3>
+    <a href="{% url 'team_create' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>New Team</a>
+</div>
+<div class="card">
+    <table class="table table-hover mb-0">
+        <thead class="table-light">
+            <tr><th>Team</th><th>Department</th><th>Manager</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td class="fw-semibold">{{ team.name }}</td>
+                <td>{{ team.department.name }}</td>
+                <td>{{ team.manager.get_full_name|default:team.manager.username|default:"—" }}</td>
+                <td><span class="badge bg-{% if team.status == 'active' %}success{% elif team.status == 'disbanded' %}danger{% else %}warning text-dark{% endif %}">{{ team.status }}</span></td>
+                <td>
+                    <a href="{% url 'team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    <a href="{% url 'team_edit' team.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No teams yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
