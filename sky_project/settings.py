@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8_pmqj02*iu%aeis*0643@%fg5mspb2d1^9b4l2%dp$d(-x7j=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sky-portal-1.orender.com']
 
 
 # Application definition
