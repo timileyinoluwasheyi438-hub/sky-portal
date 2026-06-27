@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from .models import Engineer, Team
+from .forms import TeamForm,EngineerForm
 from .models import Department, Team, AuditLog
-from .forms import TeamForm, DepartmentForm
+from .forms import TeamForm
+from .forms import DependencyForm
 
 @login_required
 def dashboard(request):
@@ -126,11 +128,32 @@ def audit_log(request):
 
 
 @login_required
-def add_engineer(request, pk):
-    team = get_object_or_404(Team, pk=pk)
+def add_engineer(request, team_pk):
+    team = get_object_or_404(Team, pk=team_pk)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        role = request.POST.get('role')
-        email = request.POST.get('email')
-        Engineer.objects.create(team=team, name=name, role=role, email=email)
-    return redirect('team_detail', pk=pk)
+        form = EngineerForm(request.POST)
+        if form.is_valid():
+            engineer = form.save(commit=False)
+            engineer.team = team
+            engineer.save()
+            messages.success(request, f"{engineer.name} added to {team.name}")
+            return redirect('team_detail', pk=team.pk)
+    else:
+        form = EngineerForm()
+    return render(request, 'teams/add_engineer.html', {'form': form, 'team': team})
+
+
+@login_required
+def add_dependency(request, team_pk):
+    team = get_object_or_404(Team, pk=team_pk)
+    if request.method == 'POST':
+        form = DependencyForm(request.POST)
+        if form.is_valid():
+            dependency = form.save(commit=False)
+            dependency.team = team
+            dependency.save()
+            messages.success(request, f"Dependency added successfully")
+            return redirect('team_detail', pk=team.pk)
+    else:
+        form = DependencyForm()
+    return render(request, 'teams/add_dependency.html', {'form': form, 'team': team})

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Add Dependency for {{ team.name }}</h3>
+    
+    <div class="card p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">This team depends on:</label>
+                {{ form.depends_on }}
+            </div>
+            <button type="submit" class="btn btn-primary">Add Dependency</button>
+            <a href="{% url 'team_detail' team.pk %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

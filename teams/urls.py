@@ -25,4 +25,6 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('audit/', views.audit_log, name='audit_log'),
     path('<int:pk>/add-engineer/', views.add_engineer, name='add_engineer'),
+    path('teams/<int:team_pk>/add-engineer/', views.add_engineer, name='add_engineer'),
+    path('teams/<int:team_pk>/add-dependency/', views.add_dependency, name='add_dependency'),
 ]
