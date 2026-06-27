@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Add Member to {{ team.name }}</h3>
+    <div class="card p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>Name</label>
+                {{ form.name }}
+            </div>
+            <div class="mb-3">
+                <label>Role</label>
+                {{ form.role }}
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                {{ form.email }}
+            </div>
+            <button type="submit" class="btn btn-primary">Add Member</button>
+            <a href="{% url 'team_detail' team.pk %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
