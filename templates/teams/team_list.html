@@ -14,7 +14,13 @@
             <tr>
                 <td class="fw-semibold">{{ team.name }}</td>
                 <td>{{ team.department.name }}</td>
-                <td>{{ team.manager.get_full_name|default:team.manager.username|default:"—" }}</td>
+               <td>
+    {% if team.manager %}
+        {{ team.manager.get_full_name|default:team.manager.username|default:"—" }}
+    {% else %}
+        —
+    {% endif %}
+</td>
                 <td><span class="badge bg-{% if team.status == 'active' %}success{% elif team.status == 'disbanded' %}danger{% else %}warning text-dark{% endif %}">{{ team.status }}</span></td>
                 <td>
                     <a href="{% url 'team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View</a>

@@ -1,30 +1,72 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">All Teams</h3>
-    <a href="{% url 'team_create' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>New Team</a>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">{{ team.name }}</h2>
+        <div>
+            <a href="{% url 'team_edit' team.pk %}" class="btn btn-warning">Edit Team</a>
+            <a href="{% url 'team_list' %}" class="btn btn-secondary">Back to Teams</a>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Department:</strong> {{ team.department.name }}</p>
+                <p><strong>Manager:</strong> 
+    {% if team.manager %}
+        {{ team.manager.get_full_name|default:team.manager.username }}
+    {% else %}
+        No manager assigned
+    {% endif %}
+</p>
+                <p><strong>Status:</strong> <span class="badge bg-{% if team.status == 'active' %}success{% else %}warning{% endif %}">{{ team.status|title }}</span></p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Purpose:</strong> {{ team.purpose }}</p>
+                <p><strong>Responsibilities:</strong> {{ team.responsibilities|default:"—" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engineers / Members Section -->
+    <h4 class="mb-3">Team Members</h4>
+    <div class="card">
+        <div class="card-body">
+            {% if engineers %}
+                <ul class="list-group">
+                    {% for engineer in engineers %}
+                    <li class="list-group-item">
+                        <strong>{{ engineer.name }}</strong> — {{ engineer.role }}
+                        {% if engineer.email %}<br><small class="text-muted">{{ engineer.email }}</small>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No members added yet.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
-<div class="card">
-    <table class="table table-hover mb-0">
-        <thead class="table-light">
-            <tr><th>Team</th><th>Department</th><th>Manager</th><th>Status</th><th>Actions</th></tr>
-        </thead>
-        <tbody>
-            {% for team in teams %}
-            <tr>
-                <td class="fw-semibold">{{ team.name }}</td>
-                <td>{{ team.department.name }}</td>
-                <td>{{ team.manager.get_full_name|default:team.manager.username|default:"—" }}</td>
-                <td><span class="badge bg-{% if team.status == 'active' %}success{% elif team.status == 'disbanded' %}danger{% else %}warning text-dark{% endif %}">{{ team.status }}</span></td>
-                <td>
-                    <a href="{% url 'team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View</a>
-                    <a href="{% url 'team_edit' team.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5" class="text-center text-muted py-4">No teams yet.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+<div class="mt-5">
+    <h5>Add New Member</h5>
+    <form method="post" action="{% url 'add_engineer' team.pk %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="name" class="form-control" placeholder="Full Name" required>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="role" class="form-control" placeholder="Role (e.g. Backend Developer)" required>
+            </div>
+            <div class="col-md-3">
+                <input type="email" name="email" class="form-control" placeholder="Email">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success">Add</button>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

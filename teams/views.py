@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from .models import Engineer, Team
 from .models import Department, Team, AuditLog
 from .forms import TeamForm, DepartmentForm
 
@@ -23,7 +24,7 @@ def team_list(request):
     return render(request, 'teams/team_list.html', {'teams': teams})
 
 @login_required
-def team_detail(request, pk):
+def team_details(request, pk):
     team = get_object_or_404(Team, pk=pk)
     context = {
         'team': team,
@@ -31,24 +32,46 @@ def team_detail(request, pk):
         'upstream': team.dependencies.all(),
         'downstream': team.dependents.all(),
     }
-    return render(request, 'teams/team_detail.html', context)
+    return render(request, 'teams/team_details.html', context)
 
 @login_required
 def team_create(request):
     if request.method == 'POST':
         form = TeamForm(request.POST)
         if form.is_valid():
+            # === Create new department if provided ===
+            new_name = form.cleaned_data.get('new_department_name')
+            new_desc = form.cleaned_data.get('new_department_description')
+
+            if new_name and new_name.strip():
+                department, created = Department.objects.get_or_create(
+                    name=new_name.strip(),
+                    defaults={'description': new_desc or ''}
+                )
+                form.instance.department = department
+
             team = form.save()
+            
+            # Optional: Log the creation
             AuditLog.objects.create(
                 user=request.user,
-                action=f"Created team '{team.name}'",
+                action=f"Created new team '{team.name}'",
                 details=f"Department: {team.department.name}"
             )
-            messages.success(request, f"Team '{team.name}' created!")
-            return redirect('team_detail', pk=team.pk)
+            
+            messages.success(request, f"Team '{team.name}' created successfully!")
+            return redirect('team_list')  
+
     else:
         form = TeamForm()
-    return render(request, 'teams/team_form.html', {'form': form, 'title': 'Create Team'})
+
+    departments = Department.objects.all()
+    return render(request, 'teams/team_form.html', {
+        'form': form,
+        'departments': departments,
+        'title': 'Create New Team'
+    })
+
 
 @login_required
 def team_edit(request, pk):
@@ -100,3 +123,14 @@ def search(request):
 def audit_log(request):
     logs = AuditLog.objects.all()
     return render(request, 'teams/audit_log.html', {'logs': logs})
+
+
+@login_required
+def add_engineer(request, pk):
+    team = get_object_or_404(Team, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        role = request.POST.get('role')
+        email = request.POST.get('email')
+        Engineer.objects.create(team=team, name=name, role=role, email=email)
+    return redirect('team_detail', pk=pk)

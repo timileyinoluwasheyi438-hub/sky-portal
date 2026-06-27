@@ -19,25 +19,34 @@
         </div>
     </div>
 </div>
-
 {% for dept in departments %}
-<div class="card mb-3">
-    <div class="card-header fw-bold" style="background:#003087; color:white;">
-        <i class="fas fa-building me-2"></i>{{ dept.name }}
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white fw-bold">
+        <i class="fas fa-building me-2"></i>{{ dept.name }} ({{ dept.teams.count }} Teams)
     </div>
     <div class="card-body">
-        <div class="row g-2">
+        <div class="row g-3">
             {% for team in dept.teams.all %}
             <div class="col-md-4">
-                <div class="card h-100 p-3">
-                    <h6 class="fw-bold">{{ team.name }}</h6>
-                    <span class="badge mb-2 bg-{% if team.status == 'active' %}success{% elif team.status == 'disbanded' %}danger{% else %}warning text-dark{% endif %}">{{ team.status }}</span>
-                    <p class="small text-muted mb-2">Manager: {{ team.manager.get_full_name|default:team.manager.username|default:"Unassigned" }}</p>
-                    <a href="{% url 'team_detail' team.pk %}" class="btn btn-sm btn-outline-primary">View Team</a>
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ team.name }}</h5>
+                        <span class="badge bg-{% if team.status == 'active' %}success{% elif team.status == 'disbanded' %}danger{% else %}warning{% endif %} mb-2">
+                            {{ team.status|title }}
+                        </span>
+                        <p><strong>Manager:</strong> 
+    {% if team.manager %}
+        {{ team.manager.get_full_name|default:team.manager.username }}
+    {% else %}
+        No manager assigned
+    {% endif %}
+</p>
+                        <a href="{% url 'team_detail' team.pk %}" class="btn btn-primary btn-sm w-100">View Team</a>
+                    </div>
                 </div>
             </div>
             {% empty %}
-            <p class="text-muted small">No teams yet.</p>
+            <p class="text-muted">No teams in this department yet.</p>
             {% endfor %}
         </div>
     </div>
