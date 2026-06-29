@@ -9,24 +9,30 @@
                 {% csrf_token %}
 
                 {% for field in form %}
+                    {% if field.name != 'new_department_name' and field.name != 'new_department_description' %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">{{ field.label }}</label>
                         {{ field }}
                         {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
                     </div>
+                    {% endif %}
                 {% endfor %}
 
-                <!-- Department Creation Section -->
+                <!-- Department -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Department <span style="color:red;">*</span></label>
                     <select name="department" class="form-control">
                         <option value="">-- Select Existing Department --</option>
                         {% for dept in departments %}
-                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            <option value="{{ dept.id }}" 
+                                {% if form.instance.department and form.instance.department.id == dept.id %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
 
+                <!-- New Department Option -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">OR Create New Department</label>
                     <input type="text" 
@@ -40,7 +46,7 @@
                     <textarea name="new_department_description" 
                               class="form-control" 
                               rows="2"
-                              placeholder="Brief description of this department..."></textarea>
+                              placeholder="Brief description..."></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save Team</button>

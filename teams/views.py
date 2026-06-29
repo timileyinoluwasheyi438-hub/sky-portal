@@ -73,8 +73,6 @@ def team_create(request):
         'departments': departments,
         'title': 'Create New Team'
     })
-
-
 @login_required
 def team_edit(request, pk):
     team = get_object_or_404(Team, pk=pk)
@@ -91,8 +89,14 @@ def team_edit(request, pk):
             return redirect('team_detail', pk=team.pk)
     else:
         form = TeamForm(instance=team)
-    return render(request, 'teams/team_form.html', {'form': form, 'title': 'Edit Team', 'team': team})
 
+    departments = Department.objects.all()
+    return render(request, 'teams/team_form.html', {
+        'form': form, 
+        'title': 'Edit Team', 
+        'team': team,
+        'departments': departments   # ← Important for dropdown
+    })
 @login_required
 def team_disband(request, pk):
     team = get_object_or_404(Team, pk=pk)
