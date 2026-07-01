@@ -78,25 +78,44 @@ def team_edit(request, pk):
     team = get_object_or_404(Team, pk=pk)
     if request.method == 'POST':
         form = TeamForm(request.POST, instance=team)
+        
+        # Handle new department creation
+        new_dept_name = request.POST.get('new_department_name', '').strip()
+        selected_dept_id = request.POST.get('department', '').strip()
+        
+        if new_dept_name:
+            dept, _ = Department.objects.get_or_create(
+                name=new_dept_name,
+                defaults={'description': request.POST.get('new_department_description', '')}
+            )
+            selected_department = dept
+        elif selected_dept_id:
+            selected_department = get_object_or_404(Department, id=selected_dept_id)
+        else:
+            selected_department = team.department  # keep existing if nothing selected
+
         if form.is_valid():
-            form.save()
+            saved_team = form.save(commit=False)
+            saved_team.department = selected_department  # force correct dept
+            saved_team.save()
             AuditLog.objects.create(
                 user=request.user,
-                action=f"Updated team '{team.name}'",
-                details=f"Status: {team.status}"
+                action=f"Updated team '{saved_team.name}'",
+                details=f"Status: {saved_team.status}"
             )
-            messages.success(request, f"Team '{team.name}' updated!")
-            return redirect('team_detail', pk=team.pk)
+            messages.success(request, f"Team '{saved_team.name}' updated!")
+            return redirect('team_detail', pk=saved_team.pk)
     else:
         form = TeamForm(instance=team)
 
     departments = Department.objects.all()
     return render(request, 'teams/team_form.html', {
-        'form': form, 
-        'title': 'Edit Team', 
+        'form': form,
+        'title': 'Edit Team',
         'team': team,
-        'departments': departments   # ← Important for dropdown
+        'departments': departments
     })
+
 @login_required
 def team_disband(request, pk):
     team = get_object_or_404(Team, pk=pk)

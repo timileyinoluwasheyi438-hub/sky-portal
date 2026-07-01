@@ -1,57 +1,85 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row">
-    <div class="col-md-7">
-        <div class="card p-4">
-            <h4 class="fw-bold mb-4">{{ title|default:'Create New Team' }}</h4>
-            
-            <form method="post">
-                {% csrf_token %}
+<style>
+  textarea.form-control {
+    height: 90px !important;
+    resize: vertical;
+  }
+  select.form-select, input.form-control, select.form-control {
+    max-width: 100%;
+  }
+</style>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm border-0 p-4">
+                <h4 class="fw-bold mb-4 border-bottom pb-3">
+                    <i class="fas fa-users me-2 text-primary"></i>{{ title|default:'Create New Team' }}
+                </h4>
 
-                {% for field in form %}
-                    {% if field.name != 'new_department_name' and field.name != 'new_department_description' %}
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        {% if field.name != 'new_department_name' and field.name != 'new_department_description' and field.name != 'department' %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">{{ field.label }}</label>
+                            <div>{{ field }}</div>
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Department Section -->
+                    <div class="card bg-light border-0 p-3 mb-4">
+                        <h6 class="fw-bold mb-3 text-secondary">
+                            <i class="fas fa-building me-2"></i>Department
+                        </h6>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Select Existing Department <span class="text-danger">*</span></label>
+                            <select name="department" class="form-select">
+                                <option value="">-- Select Department --</option>
+                                {% for dept in departments %}
+                                    <option value="{{ dept.id }}"
+                                        {% if form.instance.department and form.instance.department.id == dept.id %}selected{% endif %}>
+                                        {{ dept.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="text-center text-muted my-2 fw-bold">— OR —</div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Create New Department</label>
+                            <input type="text"
+                                   name="new_department_name"
+                                   class="form-control"
+                                   placeholder="e.g. Engineering, Marketing...">
+                        </div>
+
+                        <div class="mb-1">
+                            <label class="form-label fw-semibold">New Department Description <span class="text-muted">(Optional)</span></label>
+                            <textarea name="new_department_description"
+                                      class="form-control"
+                                      rows="2"
+                                      placeholder="Brief description..."></textarea>
+                        </div>
                     </div>
-                    {% endif %}
-                {% endfor %}
 
-                <!-- Department -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Department <span style="color:red;">*</span></label>
-                    <select name="department" class="form-control">
-                        <option value="">-- Select Existing Department --</option>
-                        {% for dept in departments %}
-                            <option value="{{ dept.id }}" 
-                                {% if form.instance.department and form.instance.department.id == dept.id %}selected{% endif %}>
-                                {{ dept.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- New Department Option -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">OR Create New Department</label>
-                    <input type="text" 
-                           name="new_department_name" 
-                           class="form-control" 
-                           placeholder="e.g. Engineering, Marketing, Data Science">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">New Department Description (Optional)</label>
-                    <textarea name="new_department_description" 
-                              class="form-control" 
-                              rows="2"
-                              placeholder="Brief description..."></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Save Team</button>
-                <a href="{% url 'team_list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
-            </form>
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i>Save Team
+                        </button>
+                        <a href="{% url 'team_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
